@@ -111,4 +111,56 @@ impl Parser {
             Regex::new(&attr_pattern).unwrap().is_match(tag_str)
         }).collect()
     }
+
+    /// Extracts the content (text) from inside HTML tags of the specified type
+    /// 
+    /// This method returns only the text content between the opening and closing tags,
+    /// without the tags themselves or any HTML attributes.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `tag` - The HTML tag name to search for (e.g., "a", "p", "div")
+    /// 
+    /// # Returns
+    /// 
+    /// A vector of strings containing the text content of all matching tags
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # // This example is for internal documentation only and not run as a test
+    /// # // To use this in your code, you would need to import Parser from the parser module
+    /// # use tagparser::parser::Parser;
+    /// # 
+    /// let html = r#"
+    ///     <a href="https://github.com">GitHub</a>
+    ///     <p>This is a <strong>paragraph</strong> with some text.</p>
+    ///     <div class="container">Some content</div>
+    /// "#;
+    /// 
+    /// let mut parser = Parser::new(html.to_string());
+    /// 
+    /// // Extract content from links
+    /// let link_texts = parser.extract_tag_content("a".to_string());
+    /// assert_eq!(link_texts, vec!["GitHub"]);
+    /// 
+    /// // Extract content from paragraphs (includes nested HTML)
+    /// let paragraph_texts = parser.extract_tag_content("p".to_string());
+    /// assert_eq!(paragraph_texts, vec!["This is a <strong>paragraph</strong> with some text."]);
+    /// 
+    /// // Extract content from divs
+    /// let div_texts = parser.extract_tag_content("div".to_string());
+    /// assert_eq!(div_texts, vec!["Some content"]);
+    /// ```
+    pub fn extract_tag_content(&mut self, tag: String) -> Vec<String> {
+        // Create a regex pattern that captures the content between tags
+        let pattern = format!(r"<{}.*?>(.*?)</{}.*?>", tag, tag);
+        
+        // Find all matches and extract the captured group (content)
+        Regex::new(&pattern)
+            .unwrap()
+            .captures_iter(&self.html)
+            .map(|cap| cap[1].to_string())
+            .collect()
+    }
 }

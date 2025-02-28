@@ -7,6 +7,7 @@ A lightweight Rust library for parsing HTML tags with powerful filtering capabil
 - Extract any HTML tags from HTML content
 - Filter tags by attribute name (e.g., find all links with `href` attribute)
 - Filter tags by attribute value (e.g., find all links to a specific URL)
+- Extract text content from inside tags (e.g., get link text without HTML)
 - Simple and intuitive API
 - Command-line interface for quick parsing
 
@@ -14,7 +15,7 @@ A lightweight Rust library for parsing HTML tags with powerful filtering capabil
 
 ### Installation
 
-You can install Ahref using cargo:
+You can install Tagparser using cargo:
 
 ```
 cargo add tagparser
@@ -73,6 +74,36 @@ Button links: ["<a class='button' href='https://example.com'>Link 2</a>"]
 GitHub links: ["<a href='https://github.com/tenqz'>Link 1</a>"]
 ```
 
+### Extracting Content from Tags
+
+You can extract just the text content from inside tags:
+
+```rust
+use tagparser::extract_tag_content;
+
+fn main() {
+    let html = r#"
+        <a href='https://github.com'>GitHub</a>
+        <p>This is a <strong>paragraph</strong> with text.</p>
+        <a href='https://rust-lang.org'>Rust Language</a>
+    "#.to_string();
+    
+    // Extract text from all links
+    let link_texts = extract_tag_content(html.clone(), "a".to_string());
+    println!("Link texts: {:?}", link_texts);
+    
+    // Extract text from paragraphs (includes nested HTML)
+    let paragraph_texts = extract_tag_content(html.clone(), "p".to_string());
+    println!("Paragraph texts: {:?}", paragraph_texts);
+}
+```
+
+Output:
+```text
+Link texts: ["GitHub", "Rust Language"]
+Paragraph texts: ["This is a <strong>paragraph</strong> with text."]
+```
+
 ### Command Line Usage
 
 You can also use Tagparser as a command-line tool:
@@ -86,6 +117,9 @@ tagparser "<html>...</html>" "a" "href"
 
 # Filter by attribute value - extract tags with a specific attribute value
 tagparser "<html>...</html>" "a" "href" "https://github.com"
+
+# Extract content - extract only the text content inside tags
+tagparser "<html>...</html>" "a" "--content"
 ```
 
 ## Development

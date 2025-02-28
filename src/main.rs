@@ -18,6 +18,9 @@ use std::env;
 /// 
 /// # Filter by attribute value - extract tags with a specific attribute value
 /// tagparser "<html>...</html>" "a" "href" "https://github.com"
+/// 
+/// # Extract content - extract only the text content inside tags
+/// tagparser "<html>...</html>" "a" "--content"
 /// ```
 /// 
 /// # Examples
@@ -39,11 +42,18 @@ use std::env;
 ///    tagparser "<a class='button'>Button 1</a><a class='link'>Link</a>" "a" "class" "button"
 ///    ```
 ///    Output: `["<a class='button'>Button 1</a>"]`
+/// 
+/// 4. Extract text content from links:
+///    ```bash
+///    tagparser "<a href='https://example.com'>Example</a><a href='#'>Home</a>" "a" "--content"
+///    ```
+///    Output: `["Example", "Home"]`
 pub fn main() {
     let args: Vec<String> = env::args().collect();
     
     if args.len() < 3 {
         println!("Usage: tagparser <html> <tag> [attr_name] [attr_value]");
+        println!("       tagparser <html> <tag> --content");
         return;
     }
     
@@ -53,10 +63,16 @@ pub fn main() {
     let mut parser = Parser::new(html.to_string());
     
     if args.len() >= 4 {
-        let attr_name = &args[3];
-        let attr_value = if args.len() >= 5 { Some(args[4].as_str()) } else { None };
-        
-        println!("{:?}", parser.parse_tags_with_attr(tag.to_string(), attr_name, attr_value));
+        if args[3] == "--content" {
+            // Extract content from tags
+            println!("{:?}", parser.extract_tag_content(tag.to_string()));
+        } else {
+            // Filter by attribute
+            let attr_name = &args[3];
+            let attr_value = if args.len() >= 5 { Some(args[4].as_str()) } else { None };
+            
+            println!("{:?}", parser.parse_tags_with_attr(tag.to_string(), attr_name, attr_value));
+        }
     } else {
         println!("{:?}", parser.parse_tags(tag.to_string()));
     }

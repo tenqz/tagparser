@@ -62,4 +62,45 @@ fn test_cli_usage_message() {
     
     let stdout = str::from_utf8(&output.stdout).unwrap();
     assert!(stdout.contains("Usage: tagparser <html> <tag> [attr_name] [attr_value]"));
+}
+
+#[test]
+fn test_cli_extract_content() {
+    let html = "<a href='https://example.com'>Example</a><a href='#'>Home</a>";
+    
+    let output = Command::new("cargo")
+        .args(&["run", "--", html, "a", "--content"])
+        .output()
+        .expect("Failed to execute command");
+    
+    let stdout = str::from_utf8(&output.stdout).unwrap();
+    assert!(stdout.contains("\"Example\""));
+    assert!(stdout.contains("\"Home\""));
+    assert!(!stdout.contains("href"));
+}
+
+#[test]
+fn test_cli_extract_content_empty() {
+    let html = "<p></p>";
+    
+    let output = Command::new("cargo")
+        .args(&["run", "--", html, "p", "--content"])
+        .output()
+        .expect("Failed to execute command");
+    
+    let stdout = str::from_utf8(&output.stdout).unwrap();
+    assert_eq!("[\"\"]", stdout.trim());
+}
+
+#[test]
+fn test_cli_extract_content_no_matches() {
+    let html = "<p>Paragraph</p>";
+    
+    let output = Command::new("cargo")
+        .args(&["run", "--", html, "div", "--content"])
+        .output()
+        .expect("Failed to execute command");
+    
+    let stdout = str::from_utf8(&output.stdout).unwrap();
+    assert_eq!("[]", stdout.trim());
 } 

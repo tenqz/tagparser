@@ -106,3 +106,75 @@ pub fn parse_tags_with_attr(html: String, tag: String, attr_name: &str, attr_val
     let mut parser = Parser::new(html);
     parser.parse_tags_with_attr(tag, attr_name, attr_value)
 }
+
+/// Extract the text content from inside HTML tags
+/// 
+/// This function extracts only the text content between the opening and closing tags,
+/// without the tags themselves or any HTML attributes.
+/// 
+/// # Arguments
+/// 
+/// * `html` - HTML content to parse
+/// * `tag` - The HTML tag name to search for (e.g., "a", "p", "div")
+/// 
+/// # Returns
+/// 
+/// A vector of strings containing the text content of all matching tags
+/// 
+/// # Examples
+/// 
+/// Basic usage - extracting text from links and paragraphs:
+/// 
+/// ```
+///     use tagparser::extract_tag_content;
+///
+///     let html = r#"
+///         <a href='https://github.com'>GitHub</a>
+///         <p>This is a <strong>paragraph</strong> with text.</p>
+///         <a href='https://rust-lang.org'>Rust Language</a>
+///     "#.to_string();
+///     
+///     // Extract text from all links
+///     let link_texts = extract_tag_content(html.clone(), "a".to_string());
+///     assert_eq!(
+///         vec!["GitHub", "Rust Language"],
+///         link_texts
+///     );
+///     
+///     // Extract text from paragraphs (includes nested HTML)
+///     let paragraph_texts = extract_tag_content(html.clone(), "p".to_string());
+///     assert_eq!(
+///         vec!["This is a <strong>paragraph</strong> with text."],
+///         paragraph_texts
+///     );
+/// ```
+/// 
+/// # Common Use Cases
+/// 
+/// 1. Extract link text without HTML:
+///    ```
+///    # use tagparser::extract_tag_content;
+///    # let html = "<a href='https://example.com'>Visit Example</a>".to_string();
+///    let link_texts = extract_tag_content(html, "a".to_string());
+///    // Returns: ["Visit Example"]
+///    ```
+/// 
+/// 2. Extract headings from a page:
+///    ```
+///    # use tagparser::extract_tag_content;
+///    # let html = "<h1>Main Title</h1><h2>Subtitle</h2>".to_string();
+///    let headings = extract_tag_content(html, "h1".to_string());
+///    // Returns: ["Main Title"]
+///    ```
+/// 
+/// 3. Extract list items:
+///    ```
+///    # use tagparser::extract_tag_content;
+///    # let html = "<ul><li>Item 1</li><li>Item 2</li></ul>".to_string();
+///    let items = extract_tag_content(html, "li".to_string());
+///    // Returns: ["Item 1", "Item 2"]
+///    ```
+pub fn extract_tag_content(html: String, tag: String) -> Vec<String> {
+    let mut parser = Parser::new(html);
+    parser.extract_tag_content(tag)
+}

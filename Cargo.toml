@@ -1,16 +1,15 @@
 [package]
 name = "tagparser"
-description = "Extract any tags from html page"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
-rust-version = "1.72.0"
+description = "A lightweight Rust library for parsing HTML tags with powerful filtering capabilities"
+license = "MIT"
 repository = "https://github.com/tenqz/tagparser"
 readme = "README.md"
-keywords = ["cli", "web", "parser", "parse", "html"]
-categories = ["parsing", "web-programming", "command-line-utilities"]
-license = "MIT"
-documentation = "https://docs.rs/tagparser"
-exclude = ["tests/", ".github/", ".gitignore"]
+keywords = ["html", "parser", "tag", "web", "scraping"]
+categories = ["parsing", "web-programming"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
 name = "tagparser"

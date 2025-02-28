@@ -1,4 +1,4 @@
-use tagparser::{parse_tags, parse_tags_with_attr};
+use tagparser::{parse_tags, parse_tags_with_attr, extract_tag_content};
 
 #[test]
 fn test_parse_tags() {
@@ -137,5 +137,89 @@ fn test_multiple_attributes() {
     assert_eq!(
         vec!["<a href='https://example.com' class='button' id='link1' data-test='value'>Link</a>".to_string()],
         tags_with_data_attr
+    );
+}
+
+#[test]
+fn test_extract_tag_content() {
+    let html = r#"
+        <a href='https://github.com'>GitHub</a>
+        <p>This is a <strong>paragraph</strong> with text.</p>
+        <a href='https://rust-lang.org'>Rust Language</a>
+        <div class="container">Some content</div>
+    "#.to_string();
+    
+    // Test extracting content from links
+    let link_texts = extract_tag_content(html.clone(), "a".to_string());
+    assert_eq!(
+        vec!["GitHub", "Rust Language"],
+        link_texts
+    );
+    
+    // Test extracting content from paragraphs (includes nested HTML)
+    let paragraph_texts = extract_tag_content(html.clone(), "p".to_string());
+    assert_eq!(
+        vec!["This is a <strong>paragraph</strong> with text."],
+        paragraph_texts
+    );
+    
+    // Test extracting content from divs
+    let div_texts = extract_tag_content(html.clone(), "div".to_string());
+    assert_eq!(
+        vec!["Some content"],
+        div_texts
+    );
+}
+
+#[test]
+fn test_extract_tag_content_empty() {
+    let html = "<p></p><a href='https://example.com'></a>".to_string();
+    
+    // Test with empty content
+    let p_texts = extract_tag_content(html.clone(), "p".to_string());
+    assert_eq!(vec![""], p_texts);
+    
+    let a_texts = extract_tag_content(html.clone(), "a".to_string());
+    assert_eq!(vec![""], a_texts);
+}
+
+#[test]
+fn test_extract_tag_content_nonexistent() {
+    let html = "<p>Paragraph</p>".to_string();
+    
+    // Test with non-existent tag
+    let div_texts = extract_tag_content(html.clone(), "div".to_string());
+    assert_eq!(Vec::<String>::new(), div_texts);
+}
+
+#[test]
+fn test_extract_tag_content_with_attributes() {
+    let html = r#"
+        <a href='https://example.com' class='link' id='link1'>Example</a>
+        <a href='https://rust-lang.org' class='official'>Rust</a>
+    "#.to_string();
+    
+    // Test with tags having multiple attributes
+    let link_texts = extract_tag_content(html, "a".to_string());
+    assert_eq!(
+        vec!["Example", "Rust"],
+        link_texts
+    );
+}
+
+#[test]
+fn test_extract_tag_content_nested_tags() {
+    let html = r#"
+        <div class="outer">
+            <div class="inner">Nested content</div>
+            Outer content
+        </div>
+    "#.to_string();
+    
+    // Test with nested tags of the same type
+    let div_texts = extract_tag_content(html, "div".to_string());
+    assert_eq!(
+        vec!["Nested content"],
+        div_texts
     );
 } 
