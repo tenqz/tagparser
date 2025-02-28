@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Information about the Rust programming language">
+    <title>Rust Programming Language</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background-color: #FF7043;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .nav {
+            background-color: #333;
+            overflow: hidden;
+        }
+        .nav a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .feature-list {
+            list-style-type: square;
+        }
+        .code-example {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 id="main-title">Rust Programming Language</h1>
+            <img src="rust-logo.png" alt="Rust Logo" width="150" height="150">
+        </header>
+
+        <nav class="nav">
+            <a href="#about" class="nav-link">About Rust</a>
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#examples" class="nav-link">Code Examples</a>
+            <a href="#resources" class="nav-link">Resources</a>
+            <a href="https://www.rust-lang.org" class="nav-link external" target="_blank">Official Website</a>
+        </nav>
+
+        <section id="about" class="section">
+            <h2>About Rust</h2>
+            <p>Rust is a systems programming language that runs blazingly fast, prevents almost all crashes, and guarantees thread safety.</p>
+            <p>Developed by Mozilla Research, <span class="highlight">Rust</span> combines low-level performance control with high-level language convenience.</p>
+            <blockquote cite="https://www.rust-lang.org">
+                Rust empowers millions of developers to build reliable and efficient software.
+            </blockquote>
+        </section>
+
+        <section id="features" class="section">
+            <h2>Rust Features</h2>
+            <ul class="feature-list">
+                <li>Memory safety without garbage collection</li>
+                <li>Concurrency without data races</li>
+                <li>Zero-cost abstractions</li>
+                <li>Minimal runtime</li>
+                <li>Efficient C bindings</li>
+            </ul>
+            
+            <div class="subsection">
+                <h3>Ownership System</h3>
+                <p>Rust's ownership system with compile-time borrowing checks ensures memory and thread safety without a garbage collector.</p>
+            </div>
+        </section>
+
+        <section id="examples" class="section">
+            <h2>Code Examples</h2>
+            
+            <h3>Hello, World!</h3>
+            <pre class="code-example"><code>
+fn main() {
+    println!("Hello, world!");
+}
+            </code></pre>
+            
+            <h3>Data Structures</h3>
+            <pre class="code-example"><code>
+struct Person {
+    name: String,
+    age: u32,
+}
+
+impl Person {
+    fn new(name: String, age: u32) -> Person {
+        Person { name, age }
+    }
+    
+    fn greet(&self) {
+        println!("Hello, my name is {} and I am {} years old.", self.name, self.age);
+    }
+}
+            </code></pre>
+        </section>
+
+        <section id="resources" class="section">
+            <h2>Learning Resources</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Resource</th>
+                        <th>Description</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>The Rust Programming Language Book</td>
+                        <td>Official Rust book</td>
+                        <td><a href="https://doc.rust-lang.org/book/" class="resource-link">Read Online</a></td>
+                    </tr>
+                    <tr>
+                        <td>Rust by Example</td>
+                        <td>Learn Rust through examples</td>
+                        <td><a href="https://doc.rust-lang.org/rust-by-example/" class="resource-link">Open</a></td>
+                    </tr>
+                    <tr>
+                        <td>Rustlings</td>
+                        <td>Small exercises to learn Rust</td>
+                        <td><a href="https://github.com/rust-lang/rustlings" class="resource-link">GitHub</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="section">
+            <h2>Subscribe to Updates</h2>
+            <form action="/subscribe" method="post" class="subscribe-form">
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                </div>
+                <div>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" placeholder="Your name">
+                </div>
+                <div>
+                    <label>Interests:</label>
+                    <input type="checkbox" id="web" name="interests" value="web">
+                    <label for="web">Web Development</label>
+                    <input type="checkbox" id="systems" name="interests" value="systems">
+                    <label for="systems">Systems Programming</label>
+                    <input type="checkbox" id="embedded" name="interests" value="embedded">
+                    <label for="embedded">Embedded Systems</label>
+                </div>
+                <div>
+                    <label for="experience">Rust Experience:</label>
+                    <select id="experience" name="experience">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="submit" value="Subscribe">
+                    <input type="reset" value="Clear">
+                </div>
+            </form>
+        </section>
+
+        <footer class="footer">
+            <p>&copy; 2023 Rust Community</p>
+            <address>
+                Contact us: <a href="mailto:info@rust-lang.org">info@rust-lang.org</a>
+            </address>
+            <div class="social-links">
+                <a href="https://twitter.com/rustlang" class="social-link" target="_blank">Twitter</a> |
+                <a href="https://github.com/rust-lang" class="social-link" target="_blank">GitHub</a> |
+                <a href="https://discord.gg/rust-lang" class="social-link" target="_blank">Discord</a>
+            </div>
+            <hr>
+            <small>Created with HTML5 and CSS3</small>
+        </footer>
+    </div>
+
+    <!-- Self-closing tags -->
+    <br>
+    <hr>
+    <img src="rust-community.jpg" alt="Rust Community">
+    <input type="hidden" name="source" value="homepage">
+    <meta name="keywords" content="rust, programming, systems language">
+
+    <!-- Script for interactivity -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Rust page loaded!');
+        });
+    </script>
+</body>
+</html> 
