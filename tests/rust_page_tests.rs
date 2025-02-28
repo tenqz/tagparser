@@ -59,16 +59,16 @@ fn test_extract_tag_content() {
     assert_eq!(h1_content.len(), 1);
     assert_eq!(h1_content[0], "Rust Programming Language");
     
-    // Проверяем содержимое h2 тегов
+    // Test extracting content from h2 tags
     let h2_content = extract_tag_content(html.clone(), "h2".to_string());
     assert!(h2_content.len() >= 5);
     assert!(h2_content.iter().any(|content| content == "About Rust"));
     assert!(h2_content.iter().any(|content| content == "Rust Features"));
     assert!(h2_content.iter().any(|content| content == "Code Examples"));
     
-    // Проверяем содержимое p тегов
+    // Test extracting content from p tags
     let p_content = extract_tag_content(html.clone(), "p".to_string());
-    // Проверяем только наличие содержимого, а не количество
+    // Check only for content presence, not the exact count
     assert!(!p_content.is_empty());
     assert!(p_content.iter().any(|content| content.contains("systems programming language")));
 }
@@ -84,15 +84,15 @@ fn test_extract_attribute_values() {
     assert!(hrefs.iter().any(|href| href == "https://doc.rust-lang.org/book/"));
     assert!(hrefs.iter().any(|href| href == "https://github.com/rust-lang/rustlings"));
     
-    // Проверяем атрибуты class у элементов
+    // Test extracting class attributes from elements
     let classes = extract_attribute_values(html.clone(), "a".to_string(), "class");
     assert!(classes.contains(&"nav-link".to_string()));
     
-    // Проверяем атрибуты id у заголовков
+    // Test extracting id attributes from headings
     let h1_ids = extract_attribute_values(html.clone(), "h1".to_string(), "id");
     assert!(h1_ids.contains(&"main-title".to_string()));
     
-    // Проверяем атрибуты section
+    // Test extracting section attributes
     let section_ids = extract_attribute_values(html.clone(), "section".to_string(), "id");
     assert!(section_ids.contains(&"about".to_string()));
     assert!(section_ids.contains(&"features".to_string()));
@@ -103,14 +103,14 @@ fn test_extract_attribute_values() {
 fn test_form_elements() {
     let html = load_test_html();
     
-    // Примечание: из-за особенностей работы парсера, self-closing теги без закрывающего слеша
-    // могут не обнаруживаться, если нет соответствующего закрывающего тега в HTML
+    // Note: due to the parser's behavior, self-closing tags without a closing slash
+    // may not be detected if there is no corresponding closing tag in the HTML
     
-    // Проверяем атрибуты input тегов напрямую
+    // Test extracting input tag attributes directly
     let input_types = extract_attribute_values(html.clone(), "input".to_string(), "type");
     println!("input_types: {:?}", input_types);
     
-    // Временно отключаем проверки, которые не проходят
+    // Temporarily disable checks that don't pass
     // assert!(input_types.contains(&"email".to_string()));
     // assert!(input_types.contains(&"text".to_string()));
     // assert!(input_types.contains(&"checkbox".to_string()));
@@ -130,23 +130,23 @@ fn test_form_elements() {
 fn test_self_closing_tags() {
     let html = load_test_html();
     
-    // Примечание: из-за особенностей работы парсера, self-closing теги без закрывающего слеша
-    // могут не обнаруживаться, если нет соответствующего закрывающего тега в HTML
+    // Note: due to the parser's behavior, self-closing tags without a closing slash
+    // may not be detected if there is no corresponding closing tag in the HTML
     
-    // Проверяем атрибуты meta тегов напрямую
+    // Test extracting meta tag attributes directly
     let meta_names = extract_attribute_values(html.clone(), "meta".to_string(), "name");
     println!("meta_names: {:?}", meta_names);
     
-    // Временно отключаем проверки, которые не проходят
+    // Temporarily disable checks that don't pass
     // assert!(meta_names.contains(&"viewport".to_string()));
     // assert!(meta_names.contains(&"description".to_string()));
     // assert!(meta_names.contains(&"keywords".to_string()));
     
-    // Проверяем атрибуты input тегов напрямую
+    // Test extracting input tag attributes directly
     let input_types = extract_attribute_values(html.clone(), "input".to_string(), "type");
     println!("input_types: {:?}", input_types);
     
-    // Временно отключаем проверки, которые не проходят
+    // Temporarily disable checks that don't pass
     // assert!(input_types.contains(&"email".to_string()));
     // assert!(input_types.contains(&"text".to_string()));
     // assert!(input_types.contains(&"checkbox".to_string()));
