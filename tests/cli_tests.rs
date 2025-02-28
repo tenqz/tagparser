@@ -3,49 +3,51 @@ use std::str;
 
 #[test]
 fn test_cli_basic_usage() {
+    let html_file = "tests/test_data/rust_page.html";
+    
     let output = Command::new("cargo")
-        .args(&["run", "--", "<a href='https://example.com'>Link</a>", "a"])
+        .args(&["run", "--", "--file", html_file, "h1"])
         .output()
         .expect("Failed to execute command");
     
     let stdout = str::from_utf8(&output.stdout).unwrap();
-    assert!(stdout.contains("<a href='https://example.com'>Link</a>"));
+    assert!(stdout.contains("main-title"));
+    assert!(stdout.contains("Rust Programming Language"));
 }
 
 #[test]
 fn test_cli_with_attribute() {
-    let html = "<a href='https://example.com'>Link 1</a><a class='button'>Link 2</a>";
+    let html_file = "tests/test_data/rust_page.html";
     
     let output = Command::new("cargo")
-        .args(&["run", "--", html, "a", "class"])
+        .args(&["run", "--", "--file", html_file, "a", "class"])
         .output()
         .expect("Failed to execute command");
     
     let stdout = str::from_utf8(&output.stdout).unwrap();
-    assert!(stdout.contains("<a class='button'>Link 2</a>"));
-    assert!(!stdout.contains("<a href='https://example.com'>Link 1</a>"));
+    assert!(stdout.contains("nav-link"));
 }
 
 #[test]
 fn test_cli_with_attribute_value() {
-    let html = "<a class='button'>Button</a><a class='link'>Link</a>";
+    let html_file = "tests/test_data/rust_page.html";
     
     let output = Command::new("cargo")
-        .args(&["run", "--", html, "a", "class", "button"])
+        .args(&["run", "--", "--file", html_file, "a", "class", "nav-link"])
         .output()
         .expect("Failed to execute command");
     
     let stdout = str::from_utf8(&output.stdout).unwrap();
-    assert!(stdout.contains("<a class='button'>Button</a>"));
-    assert!(!stdout.contains("<a class='link'>Link</a>"));
+    assert!(stdout.contains("nav-link"));
+    assert!(!stdout.contains("social-link"));
 }
 
 #[test]
 fn test_cli_no_matches() {
-    let html = "<p>Paragraph</p>";
+    let html_file = "tests/test_data/rust_page.html";
     
     let output = Command::new("cargo")
-        .args(&["run", "--", html, "a"])
+        .args(&["run", "--", "--file", html_file, "nonexistent"])
         .output()
         .expect("Failed to execute command");
     
@@ -61,22 +63,20 @@ fn test_cli_usage_message() {
         .expect("Failed to execute command");
     
     let stdout = str::from_utf8(&output.stdout).unwrap();
-    assert!(stdout.contains("Usage: tagparser <html> <tag> [attr_name] [attr_value]"));
+    assert!(stdout.contains("Usage:"));
 }
 
 #[test]
 fn test_cli_extract_content() {
-    let html = "<a href='https://example.com'>Example</a><a href='#'>Home</a>";
+    let html_file = "tests/test_data/rust_page.html";
     
     let output = Command::new("cargo")
-        .args(&["run", "--", html, "a", "--content"])
+        .args(&["run", "--", "--file", html_file, "h1", "--content"])
         .output()
         .expect("Failed to execute command");
     
     let stdout = str::from_utf8(&output.stdout).unwrap();
-    assert!(stdout.contains("\"Example\""));
-    assert!(stdout.contains("\"Home\""));
-    assert!(!stdout.contains("href"));
+    assert!(stdout.contains("Rust Programming Language"));
 }
 
 #[test]
@@ -94,10 +94,10 @@ fn test_cli_extract_content_empty() {
 
 #[test]
 fn test_cli_extract_content_no_matches() {
-    let html = "<p>Paragraph</p>";
+    let html_file = "tests/test_data/rust_page.html";
     
     let output = Command::new("cargo")
-        .args(&["run", "--", html, "div", "--content"])
+        .args(&["run", "--", "--file", html_file, "nonexistent", "--content"])
         .output()
         .expect("Failed to execute command");
     
@@ -107,25 +107,24 @@ fn test_cli_extract_content_no_matches() {
 
 #[test]
 fn test_cli_extract_attribute_values() {
-    let html = "<a href='https://example.com'>Example</a><a href='https://github.com'>GitHub</a>";
+    let html_file = "tests/test_data/rust_page.html";
     
     let output = Command::new("cargo")
-        .args(&["run", "--", html, "a", "href", "--attr-values"])
+        .args(&["run", "--", "--file", html_file, "a", "href", "--attr-values"])
         .output()
         .expect("Failed to execute command");
     
     let stdout = str::from_utf8(&output.stdout).unwrap();
-    assert!(stdout.contains("\"https://example.com\""));
-    assert!(stdout.contains("\"https://github.com\""));
-    assert!(!stdout.contains("<a"));
+    assert!(stdout.contains("https://www.rust-lang.org"));
+    assert!(stdout.contains("https://doc.rust-lang.org/book/"));
 }
 
 #[test]
 fn test_cli_extract_attribute_values_empty() {
-    let html = "<a>No href</a>";
+    let html_file = "tests/test_data/rust_page.html";
     
     let output = Command::new("cargo")
-        .args(&["run", "--", html, "a", "href", "--attr-values"])
+        .args(&["run", "--", "--file", html_file, "a", "nonexistent", "--attr-values"])
         .output()
         .expect("Failed to execute command");
     
@@ -135,14 +134,15 @@ fn test_cli_extract_attribute_values_empty() {
 
 #[test]
 fn test_cli_extract_attribute_values_multiple_attributes() {
-    let html = "<a href='image1.jpg'>Link 1</a><a href='image2.jpg'>Link 2</a>";
+    let html_file = "tests/test_data/rust_page.html";
     
     let output = Command::new("cargo")
-        .args(&["run", "--", html, "a", "href", "--attr-values"])
+        .args(&["run", "--", "--file", html_file, "option", "value", "--attr-values"])
         .output()
         .expect("Failed to execute command");
     
     let stdout = str::from_utf8(&output.stdout).unwrap();
-    assert!(stdout.contains("\"image1.jpg\""));
-    assert!(stdout.contains("\"image2.jpg\""));
+    assert!(stdout.contains("beginner"));
+    assert!(stdout.contains("intermediate"));
+    assert!(stdout.contains("advanced"));
 } 

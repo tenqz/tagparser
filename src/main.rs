@@ -1,6 +1,7 @@
 pub mod parser;
 use crate::parser::Parser;
 use std::env;
+use std::fs;
 
 /// Tagparser CLI tool
 /// 
@@ -24,6 +25,9 @@ use std::env;
 /// 
 /// # Extract attribute values - extract values of a specific attribute
 /// tagparser "<html>...</html>" "a" "href" "--attr-values"
+/// 
+/// # Read HTML from file
+/// tagparser --file "path/to/file.html" "a"
 /// ```
 /// 
 /// # Examples
@@ -57,34 +61,62 @@ use std::env;
 ///    tagparser "<a href='https://example.com'>Example</a><a href='https://github.com'>GitHub</a>" "a" "href" "--attr-values"
 ///    ```
 ///    Output: `["https://example.com", "https://github.com"]`
+///
+/// 6. Read HTML from file:
+///    ```bash
+///    tagparser --file "index.html" "a" "href" "--attr-values"
+///    ```
+///    Output: `["https://example.com", "https://github.com"]`
 pub fn main() {
     let args: Vec<String> = env::args().collect();
     
     if args.len() < 3 {
-        println!("Usage: tagparser <html> <tag> [attr_name] [attr_value]");
-        println!("       tagparser <html> <tag> --content");
-        println!("       tagparser <html> <tag> <attr_name> --attr-values");
+        print_usage();
         return;
     }
     
-    let html = &args[1];
-    let tag = &args[2];
+    let html_content;
+    let mut tag_index = 2;
     
-    let mut parser = Parser::new(html.to_string());
+    // Check if we're reading from a file
+    if args[1] == "--file" {
+        if args.len() < 4 {
+            print_usage();
+            return;
+        }
+        
+        let file_path = &args[2];
+        match fs::read_to_string(file_path) {
+            Ok(content) => {
+                html_content = content;
+                tag_index = 3;
+            },
+            Err(e) => {
+                println!("Error reading file: {}", e);
+                return;
+            }
+        }
+    } else {
+        html_content = args[1].clone();
+    }
     
-    if args.len() >= 4 {
-        if args[3] == "--content" {
+    let tag = &args[tag_index];
+    
+    let mut parser = Parser::new(html_content);
+    
+    if args.len() > tag_index + 1 {
+        if args[tag_index + 1] == "--content" {
             // Extract content from tags
             println!("{:?}", parser.extract_tag_content(tag.to_string()));
-        } else if args.len() >= 5 && args[4] == "--attr-values" {
+        } else if args.len() > tag_index + 2 && args[tag_index + 2] == "--attr-values" {
             // Extract attribute values
-            let attr_name = &args[3];
+            let attr_name = &args[tag_index + 1];
             println!("{:?}", parser.extract_attribute_values(tag.to_string(), attr_name));
         } else {
             // Filter by attribute
-            let attr_name = &args[3];
-            let attr_value = if args.len() >= 5 && args[4] != "--attr-values" { 
-                Some(args[4].as_str()) 
+            let attr_name = &args[tag_index + 1];
+            let attr_value = if args.len() > tag_index + 2 && args[tag_index + 2] != "--attr-values" { 
+                Some(args[tag_index + 2].as_str()) 
             } else { 
                 None 
             };
@@ -94,4 +126,13 @@ pub fn main() {
     } else {
         println!("{:?}", parser.parse_tags(tag.to_string()));
     }
+}
+
+fn print_usage() {
+    println!("Usage: tagparser <html> <tag> [attr_name] [attr_value]");
+    println!("       tagparser <html> <tag> --content");
+    println!("       tagparser <html> <tag> <attr_name> --attr-values");
+    println!("       tagparser --file <path> <tag> [attr_name] [attr_value]");
+    println!("       tagparser --file <path> <tag> --content");
+    println!("       tagparser --file <path> <tag> <attr_name> --attr-values");
 }
