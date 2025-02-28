@@ -103,4 +103,46 @@ fn test_cli_extract_content_no_matches() {
     
     let stdout = str::from_utf8(&output.stdout).unwrap();
     assert_eq!("[]", stdout.trim());
+}
+
+#[test]
+fn test_cli_extract_attribute_values() {
+    let html = "<a href='https://example.com'>Example</a><a href='https://github.com'>GitHub</a>";
+    
+    let output = Command::new("cargo")
+        .args(&["run", "--", html, "a", "href", "--attr-values"])
+        .output()
+        .expect("Failed to execute command");
+    
+    let stdout = str::from_utf8(&output.stdout).unwrap();
+    assert!(stdout.contains("\"https://example.com\""));
+    assert!(stdout.contains("\"https://github.com\""));
+    assert!(!stdout.contains("<a"));
+}
+
+#[test]
+fn test_cli_extract_attribute_values_empty() {
+    let html = "<a>No href</a>";
+    
+    let output = Command::new("cargo")
+        .args(&["run", "--", html, "a", "href", "--attr-values"])
+        .output()
+        .expect("Failed to execute command");
+    
+    let stdout = str::from_utf8(&output.stdout).unwrap();
+    assert_eq!("[]", stdout.trim());
+}
+
+#[test]
+fn test_cli_extract_attribute_values_multiple_attributes() {
+    let html = "<a href='image1.jpg'>Link 1</a><a href='image2.jpg'>Link 2</a>";
+    
+    let output = Command::new("cargo")
+        .args(&["run", "--", html, "a", "href", "--attr-values"])
+        .output()
+        .expect("Failed to execute command");
+    
+    let stdout = str::from_utf8(&output.stdout).unwrap();
+    assert!(stdout.contains("\"image1.jpg\""));
+    assert!(stdout.contains("\"image2.jpg\""));
 } 

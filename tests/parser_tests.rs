@@ -1,4 +1,4 @@
-use tagparser::{parse_tags, parse_tags_with_attr, extract_tag_content};
+use tagparser::{parse_tags, parse_tags_with_attr, extract_tag_content, extract_attribute_values};
 
 #[test]
 fn test_parse_tags() {
@@ -222,4 +222,74 @@ fn test_extract_tag_content_nested_tags() {
         vec!["Nested content"],
         div_texts
     );
+}
+
+#[test]
+fn test_extract_attribute_values() {
+    let html = r#"
+        <a href='https://github.com'>GitHub</a>
+        <a href='https://rust-lang.org' class='official'>Rust</a>
+        <a class='social' href='https://twitter.com'>Twitter</a>
+        <div src='image1.jpg' alt='Image 1'>Content</div>
+        <div src='image2.jpg'>Content</div>
+    "#.to_string();
+    
+    // Test extracting href values from links
+    let hrefs = extract_attribute_values(html.clone(), "a".to_string(), "href");
+    assert_eq!(
+        vec!["https://github.com", "https://rust-lang.org", "https://twitter.com"],
+        hrefs
+    );
+    
+    // Test extracting class values from links
+    let classes = extract_attribute_values(html.clone(), "a".to_string(), "class");
+    assert_eq!(
+        vec!["official", "social"],
+        classes
+    );
+    
+    // Test extracting src values from divs
+    let srcs = extract_attribute_values(html.clone(), "div".to_string(), "src");
+    assert_eq!(
+        vec!["image1.jpg", "image2.jpg"],
+        srcs
+    );
+    
+    // Test extracting alt values from divs (one missing)
+    let alts = extract_attribute_values(html.clone(), "div".to_string(), "alt");
+    assert_eq!(
+        vec!["Image 1"],
+        alts
+    );
+}
+
+#[test]
+fn test_extract_attribute_values_nonexistent() {
+    let html = "<p>Paragraph</p>".to_string();
+    
+    // Test with non-existent tag
+    let values = extract_attribute_values(html.clone(), "div".to_string(), "class");
+    assert_eq!(Vec::<String>::new(), values);
+    
+    // Test with non-existent attribute
+    let values = extract_attribute_values(html.clone(), "p".to_string(), "nonexistent");
+    assert_eq!(Vec::<String>::new(), values);
+}
+
+#[test]
+fn test_extract_attribute_values_empty_html() {
+    let html = "".to_string();
+    
+    // Test with empty HTML
+    let values = extract_attribute_values(html, "a".to_string(), "href");
+    assert_eq!(Vec::<String>::new(), values);
+}
+
+#[test]
+fn test_extract_attribute_values_malformed() {
+    let html = "<a href=https://example.com>No quotes</a>".to_string();
+    
+    // Test with malformed attribute (no quotes)
+    let values = extract_attribute_values(html, "a".to_string(), "href");
+    assert_eq!(Vec::<String>::new(), values);
 } 

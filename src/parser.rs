@@ -38,7 +38,10 @@ impl Parser {
     /// assert_eq!(paragraphs, vec!["<p>Paragraph</p>"]);
     /// ```
     pub fn parse_tags(&mut self, tag: String) -> Vec<String> {
-        Regex::new(&format!(r"<{}.*?>.*?</{}.*?>", tag, tag))
+        // Create a pattern that matches both regular tags and self-closing tags
+        let pattern = format!(r"<{}[^>]*>.*?</{}[^>]*>|<{}[^>]*/>", tag, tag, tag);
+        
+        Regex::new(&pattern)
             .unwrap()
             .find_iter(&self.html)
             .map(|x| x.as_str().to_string())
@@ -161,6 +164,65 @@ impl Parser {
             .unwrap()
             .captures_iter(&self.html)
             .map(|cap| cap[1].to_string())
+            .collect()
+    }
+
+    /// Extracts attribute values from HTML tags of the specified type
+    /// 
+    /// This method returns the values of the specified attribute from all matching tags.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `tag` - The HTML tag name to search for (e.g., "a", "img", "div")
+    /// * `attr_name` - The attribute name to extract values from (e.g., "href", "src", "class")
+    /// 
+    /// # Returns
+    /// 
+    /// A vector of strings containing the attribute values from all matching tags.
+    /// Returns an empty vector if no matching tags or attributes are found.
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// # // This example is for internal documentation only and not run as a test
+    /// # // To use this in your code, you would need to import Parser from the parser module
+    /// # use tagparser::parser::Parser;
+    /// # 
+    /// let html = r#"
+    ///     <a href="https://github.com">GitHub</a>
+    ///     <a href="https://rust-lang.org" class="official">Rust</a>
+    ///     <a class="social" href="https://twitter.com">Twitter</a>
+    /// "#;
+    /// 
+    /// let mut parser = Parser::new(html.to_string());
+    /// 
+    /// // Extract all href values from links
+    /// let hrefs = parser.extract_attribute_values("a".to_string(), "href");
+    /// assert_eq!(
+    ///     vec!["https://github.com", "https://rust-lang.org", "https://twitter.com"],
+    ///     hrefs
+    /// );
+    /// 
+    /// // Extract all class values from links
+    /// let classes = parser.extract_attribute_values("a".to_string(), "class");
+    /// assert_eq!(
+    ///     vec!["official", "social"],
+    ///     classes
+    /// );
+    /// ```
+    pub fn extract_attribute_values(&mut self, tag: String, attr_name: &str) -> Vec<String> {
+        // First get all tags of the specified type
+        let all_tags = self.parse_tags(tag);
+        
+        // Create a regex pattern to extract the attribute value
+        let attr_pattern = format!(r#"{}=["']([^"']*)["']"#, attr_name);
+        let re = Regex::new(&attr_pattern).unwrap();
+        
+        // Extract attribute values from all matching tags
+        all_tags.iter()
+            .filter_map(|tag_str| {
+                re.captures(tag_str).map(|cap| cap[1].to_string())
+            })
             .collect()
     }
 }

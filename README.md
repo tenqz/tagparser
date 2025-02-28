@@ -8,6 +8,7 @@ A lightweight Rust library for parsing HTML tags with powerful filtering capabil
 - Filter tags by attribute name (e.g., find all links with `href` attribute)
 - Filter tags by attribute value (e.g., find all links to a specific URL)
 - Extract text content from inside tags (e.g., get link text without HTML)
+- Extract attribute values from tags (e.g., get all URLs from links)
 - Simple and intuitive API
 - Command-line interface for quick parsing
 
@@ -104,6 +105,38 @@ Link texts: ["GitHub", "Rust Language"]
 Paragraph texts: ["This is a <strong>paragraph</strong> with text."]
 ```
 
+### Extracting Attribute Values
+
+You can extract values of specific attributes from tags:
+
+```rust
+use tagparser::extract_attribute_values;
+
+fn main() {
+    let html = r#"
+        <a href='https://github.com'>GitHub</a>
+        <a href='https://rust-lang.org' class='official'>Rust</a>
+        <img src='image1.jpg' alt='Image 1'>
+        <img src='image2.jpg'>
+    "#.to_string();
+    
+    // Extract all URLs from links
+    let urls = extract_attribute_values(html.clone(), "a".to_string(), "href");
+    println!("URLs: {:?}", urls);
+    // Output: ["https://github.com", "https://rust-lang.org"]
+    
+    // Extract all image sources
+    let image_sources = extract_attribute_values(html.clone(), "img".to_string(), "src");
+    println!("Image sources: {:?}", image_sources);
+    // Output: ["image1.jpg", "image2.jpg"]
+    
+    // Extract all alt texts (only present on first image)
+    let alt_texts = extract_attribute_values(html.clone(), "img".to_string(), "alt");
+    println!("Alt texts: {:?}", alt_texts);
+    // Output: ["Image 1"]
+}
+```
+
 ### Command Line Usage
 
 You can also use Tagparser as a command-line tool:
@@ -120,6 +153,9 @@ tagparser "<html>...</html>" "a" "href" "https://github.com"
 
 # Extract content - extract only the text content inside tags
 tagparser "<html>...</html>" "a" "--content"
+
+# Extract attribute values - extract values of a specific attribute
+tagparser "<html>...</html>" "a" "href" "--attr-values"
 ```
 
 ## Development

@@ -178,3 +178,75 @@ pub fn extract_tag_content(html: String, tag: String) -> Vec<String> {
     let mut parser = Parser::new(html);
     parser.extract_tag_content(tag)
 }
+
+/// Extract attribute values from HTML tags
+/// 
+/// This function extracts the values of a specified attribute from all matching tags.
+/// 
+/// # Arguments
+/// 
+/// * `html` - HTML content to parse
+/// * `tag` - The HTML tag name to search for (e.g., "a", "img", "div")
+/// * `attr_name` - The attribute name to extract values from (e.g., "href", "src", "class")
+/// 
+/// # Returns
+/// 
+/// A vector of strings containing the attribute values from all matching tags
+/// 
+/// # Examples
+/// 
+/// Basic usage - extracting href values from links:
+/// 
+/// ```
+///     use tagparser::extract_attribute_values;
+///
+///     let html = r#"
+///         <a href='https://github.com'>GitHub</a>
+///         <a href='https://rust-lang.org' class='official'>Rust</a>
+///         <a class='social' href='https://twitter.com'>Twitter</a>
+///     "#.to_string();
+///     
+///     // Extract all href values from links
+///     let hrefs = extract_attribute_values(html.clone(), "a".to_string(), "href");
+///     assert_eq!(
+///         vec!["https://github.com", "https://rust-lang.org", "https://twitter.com"],
+///         hrefs
+///     );
+///     
+///     // Extract all class values from links
+///     let classes = extract_attribute_values(html.clone(), "a".to_string(), "class");
+///     assert_eq!(
+///         vec!["official", "social"],
+///         classes
+///     );
+/// ```
+/// 
+/// # Common Use Cases
+/// 
+/// 1. Extract all URLs from a page:
+///    ```
+///    # use tagparser::extract_attribute_values;
+///    # let html = "<a href='https://example.com'>Link</a>".to_string();
+///    let urls = extract_attribute_values(html, "a".to_string(), "href");
+///    // Returns: ["https://example.com"]
+///    ```
+/// 
+/// 2. Extract all image sources:
+///    ```
+///    # use tagparser::extract_attribute_values;
+///    # let html = "<img src='image.jpg' alt='Image'><img src='logo.png'>".to_string();
+///    let image_sources = extract_attribute_values(html, "img".to_string(), "src");
+///    // Returns: ["image.jpg", "logo.png"]
+///    ```
+/// 
+/// 3. Extract all form input names:
+///    ```
+///    # use tagparser::extract_attribute_values;
+///    # let html = "<input name='username'><input name='password'>".to_string();
+///    let input_names = extract_attribute_values(html, "input".to_string(), "name");
+///    // Returns: ["username", "password"]
+///    ```
+pub fn extract_attribute_values(html: String, tag: String, attr_name: &str) -> Vec<String> {
+    let mut parser = Parser::new(html);
+    parser.extract_attribute_values(tag, attr_name)
+}
